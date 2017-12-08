@@ -2,6 +2,8 @@ package com.csg_chaohu_ground;
 
 import java.util.*;
 
+//import com.csg_short.TerminalData;
+
 public class LocationMethod {
 	
 	final int PERMFAULT = 1;                        //永久性故障
@@ -292,6 +294,84 @@ public class LocationMethod {
 		return faultStr;
 	}
 	
+	/**
+	 * 判断grandfather与 son是不是祖孙关系
+	 * @param termMap
+	 * @param grandfather
+	 * @param son
+	 * @return true :是祖孙关系
+	 *         false:不是祖孙关系
+	 */
+	boolean isGrandfather(Map<String, TerminalDataJD> termMap, String grandfather, String son){
+		boolean valBoolean = false;//返回值
+		
+		if(termMap.containsKey(son)){
+			String father = termMap.get(son).getBeforeTerm();
+			
+			while(father != null){
+				if(father.equals(grandfather)){
+					valBoolean = true;
+					break;
+				}
+				
+				father = termMap.get(father).getBeforeTerm();
+			}
+		}
+		
+		return valBoolean;
+	}
+	
+	/**
+	 * 检查输出故障字符串，排除不符合逻辑的输出
+	 * 排除非线路末端的不确定的分支主线，如"L2,#,LB1,LB2,"其中LB1,LB2是L2的支线,要将"L2,#"排除。
+	 * 算法逻辑是从叶子节点LB1开始往根节点逆序遍历，查找祖宗节点是不是L2。
+	 * @param termMap
+	 * @param faultStr
+	 * @return 排除不符合逻辑后的输出
+	 */
+	String checkOutput(Map<String, TerminalDataJD> termMap, String faultStr){
+		
+		boolean outBoolean;
+		String tempStr = new String();
+		String val_re = new String();//保存输出结果
+		String[] faultArray = faultStr.split(",");
+		
+		//对数组正序查找一遍祖孙关系。以前一个点标识一对故障，数组下标为偶数0,2,4...
+		for(int i=0; i<faultArray.length; i+=2) {
+			outBoolean = true;//默认故障终端输出
+			
+			for(int j=i+2; j<faultArray.length; j+=2) {			
+				if(isGrandfather(termMap, faultArray[i], faultArray[j])) {//判断faultArray[i]是不是faultArray[j]的祖宗
+					outBoolean = false;
+					break;
+				}
+			}
+			
+			if(outBoolean) {
+				tempStr += faultArray[i] + "," + faultArray[i+1] + ",";
+			}
+		}
+		
+		//对数组逆序查找一遍祖孙关系(最终输出会以一对故障点为单位逆序输出，但不影响结果)
+		String[] tempStrArray = tempStr.split(",");
+		for(int i=tempStrArray.length-2; i>=0; i-=2) {
+			outBoolean = true;//默认故障终端输出
+			
+			for(int j=i-2; j>=0; j-=2) {
+				if(isGrandfather(termMap, tempStrArray[i], tempStrArray[j])) {
+					outBoolean = false;
+					break;
+				}
+			}
+			
+			if(outBoolean) {
+				val_re +=  tempStrArray[i] + "," + tempStrArray[i+1] + ",";
+			}
+		}
+		
+		return val_re;
+	}
+	
 	//接地定位封装方法
 	public String JDLocPack(Map<String, TerminalDataJD> termMap, String headTerm, int JDType,double faultRat){
 		String location = null;
@@ -301,8 +381,9 @@ public class LocationMethod {
 			faultRat = 0.5;
 		}
 			
-		
 		location = depthOrder(termMap, headTerm, JDType, faultRat);
+		//排除不符合逻辑的输出
+		location = checkOutput(termMap, location);
 		
 		return location;
 	}

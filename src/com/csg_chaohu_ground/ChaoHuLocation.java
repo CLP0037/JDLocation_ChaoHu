@@ -12,6 +12,7 @@ package com.csg_chaohu_ground;
    id,"-2" id终端后全部线路
    id,#    短信返回：id终端之后    标红：id终端之后到第一个任意节点  
 */
+//CHLV1.0->CHLV1.1针对设备漏报可能多定位出故障点的情况作出修改
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class ChaoHuLocation {
 	 * 获取程序版本号
 	 */
 	public void getVersion(){
-		System.out.println("版本号：CHLV1.0");
+		System.out.println("版本号：CHLV1.1");//
 	}
 	/**
 	 * 短路定位
@@ -77,16 +78,16 @@ public class ChaoHuLocation {
 //		TerminalDataJDLB1.beforeTerm = "L4"; TerminalDataJDLB1.afterTerm="LB2";
 //		TerminalDataJDLB2.diviceId = "LB2";
 //		TerminalDataJDLB2.beforeTerm = "LB1";		
-//		TerminalDataJDL1.JDSOE_A=0;
-//		TerminalDataJDL2.JDSOE_A=1;
-//		TerminalDataJDL3.JDSOE_B=0;
+//		TerminalDataJDL1.JDSOE_A=1;
+////		TerminalDataJDL2.JDSOE_A=1;
+////		TerminalDataJDL3.JDSOE_B=1;
 //		TerminalDataJDL4.JDSOE_B=0;
-//		TerminalDataJDL5.JDSOE_B=0;
-//		TerminalDataJDL6.JDSOE_B=0;
+//		TerminalDataJDL5.JDSOE_B=1;
+////		TerminalDataJDL6.JDSOE_B=1;
 ////		TerminalDataJDLA1.JDSOE_B=1;
 ////		TerminalDataJDLA2.JDSOE_B=1;
-////		TerminalDataJDLA3.JDSOE_B=1;
-////		TerminalDataJDLB1.JDSOE_B=1;
+//		TerminalDataJDLA3.JDSOE_B=1;
+//		TerminalDataJDLB1.JDSOE_B=1;
 ////		TerminalDataJDLB2.JDSOE_B=1;
 //
 //		termMap.put("L1", TerminalDataJDL1);
